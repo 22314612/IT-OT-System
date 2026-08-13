@@ -1,0 +1,56 @@
+﻿@model deneme10.Models.DepartmentKeyword
+@{
+    ViewData["Title"] = "Yeni Kelime Ekle";
+}
+
+<div class="d-flex justify-content-between align-items: center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">➕ Havuza Kelime Ekle</h1>
+        <p class="text-muted small mb-0">Yapay zeka algoritması için yeni bir anahtar kelime veya ağırlık kuralı tanımlayın.</p>
+    </div>
+    <a href="/DepartmentKeyword/Index" class="btn btn-outline-secondary btn-sm px-3 fw-semibold">
+        <i class="fa-solid fa-arrow-left me-1"></i> İptal / Geri Dön
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-3 p-4">
+            <form asp-action="Create" method="post">
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Hedef Departman</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-building text-muted"></i></span>
+                        <select asp-for="DepartmentId" asp-items="ViewBag.Departments" class="form-select" required>
+                            <option value="">-- Departman Seçiniz --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Anahtar Kelime / Cümle</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-key text-muted"></i></span>
+                        <input asp-for="Word" type="text" class="form-control" placeholder="Örn: arıza, internet kesintisi, şifre sıfırlama..." required />
+                    </div>
+                    <div class="form-text text-muted fs-8">Kullanıcıların taleplerinde en sık kullanacağı ifadeleri ekleyin.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Puan (Ağırlık)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-weight-scale text-muted"></i></span>
+                        <input asp-for="Weight" type="number" class="form-control" value="1" min="1" max="10" required />
+                    </div>
+                    <div class="form-text text-muted fs-8">Standart kelimeler için <strong>1</strong>, kesin eşleşme (Veto Sistemi) gerektiren kelimeler için <strong>10</strong> puan verin.</div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 fw-semibold py-2">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Kelimeyi Havuza Kaydet
+                </button>
+
+            </form>
+        </div>
+    </div>
+</div>

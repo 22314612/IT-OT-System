@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Enterprise IT Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Kurumsal İkonlar için FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+            :root {
+                --enterprise-sidebar: #0f172a;
+                --enterprise-bg: #f8fafc;
+                --enterprise-border: #e2e8f0;
+                --enterprise-primary: #2563eb;
+                --enterprise-text: #1e293b;
+                --enterprise-muted: #64748b;
+            }
+
+            body {
+                background-color: var(--enterprise-bg);
+                color: var(--enterprise-text);
+                font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+                font-size: 14px;
+            }
+
+            .enterprise-wrapper {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            /* YAN MENÜ (SIDEBAR) */
+            .enterprise-sidebar {
+                width: 270px;
+                background-color: var(--enterprise-sidebar);
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                flex-shrink: 0;
+                border-right: 1px solid #1e293b;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            }
+
+            .sidebar-header {
+                padding: 24px 20px;
+                border-bottom: 1px solid #1e293b;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+                .sidebar-header .logo-box {
+                    background: var(--enterprise-primary);
+                    color: white;
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 700;
+                    font-size: 18px;
+                }
+
+                .sidebar-header h3 {
+                    font-size: 16px;
+                    font-weight: 700;
+                    margin: 0;
+                    letter-spacing: 0.5px;
+                }
+
+                .sidebar-header span {
+                    font-size: 11px;
+                    color: #94a3b8;
+                    display: block;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+
+            .sidebar-menu {
+                list-style: none;
+                padding: 20px 12px;
+                margin: 0;
+                flex-grow: 1;
+            }
+
+                .sidebar-menu li {
+                    margin-bottom: 6px;
+                }
+
+                .sidebar-menu a {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 11px 14px;
+                    color: #94a3b8;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                }
+
+                    .sidebar-menu a:hover {
+                        background-color: #1e293b;
+                        color: #fff;
+                    }
+
+                    .sidebar-menu a.active {
+                        background-color: var(--enterprise-primary);
+                        color: #fff;
+                        font-weight: 600;
+                        box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+                    }
+
+                    .sidebar-menu a i {
+                        width: 20px;
+                        text-align: center;
+                        font-size: 15px;
+                    }
+
+            /* ÜST HEADER VE ANA İÇERİK */
+            .enterprise-main {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                overflow-x: hidden;
+            }
+
+            .top-navbar {
+                height: 70px;
+                background: #ffffff;
+                border-bottom: 1px solid var(--enterprise-border);
+                padding: 0 30px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+                .top-navbar .user-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    font-weight: 600;
+                    color: var(--enterprise-text);
+                }
+
+            /* 🌟 DÜZELTİLEN AVATAR KUTUSU (TAŞMA VE HİZALAMA SORUNU GİDERİLDİ) */
+            .user-avatar-box {
+                width: 38px;
+                height: 38px;
+                background: #f1f5f9;
+                border: 1px solid #cbd5e1;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+
+            .content-body {
+                padding: 30px;
+                flex-grow: 1;
+            }
+    </style>
+</head>
+<body>
+    <div class="enterprise-wrapper">
+        <!-- SOL KURUMSAL MENÜ -->
+        <nav class="enterprise-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-box">IT</div>
+                <div>
+                    <h3>IT PORTAL</h3>
+                    <span>Enterprise System</span>
+                </div>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="/Home/Dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> Kontrol Paneli</a></li>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                {
+                    <li><a href="/Request/Index"><i class="fa-solid fa-clipboard-list"></i> Talep Kayıtları</a></li>
+                    <li><a href="/Department/Index"><i class="fa-solid fa-building"></i> Departmanlar</a></li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li><a href="/DepartmentKeyword/Index"><i class="fa-solid fa-brain"></i> AI Kelime Havuzu</a></li>
+                    }
+                    <li><a href="/User/Index"><i class="fa-solid fa-users"></i> Personel Listesi</a></li>
+                    <li><a href="/User/Create" style="color: #34d399;"><i class="fa-solid fa-user-plus"></i> Yeni Personel</a></li>
+                }
+                else
+                {
+                    <li><a href="/Request/Index"><i class="fa-solid fa-clipboard-user"></i> Taleplerim</a></li>
+                }
+
+                <li><a href="/Profile/Index"><i class="fa-solid fa-user-gear"></i> Profil Ayarları</a></li>
+                <li style="margin-top: 40px;"><a href="/Home/Logout" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
+            </ul>
+        </nav>
+
+        <!-- SAĞ İÇERİK ALANI -->
+        <div class="enterprise-main">
+            <header class="top-navbar">
+                <div class="fw-semibold text-secondary">
+                    <i class="fa-solid fa-building-shield me-2"></i> Operasyonel Yönetim ve Destek Ekranı
+                </div>
+                <div class="user-info">
+                    <!-- 🌟 DÜZELTİLEN ALAN -->
+                    <div class="user-avatar-box">
+                        <i class="fa-solid fa-user text-primary" style="font-size: 15px;"></i>
+                    </div>
+                    <span>@User.Identity.Name</span>
+                </div>
+            </header>
+
+            <main class="content-body">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

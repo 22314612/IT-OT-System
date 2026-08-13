@@ -1,0 +1,144 @@
+﻿@model deneme10.Models.Record
+@{
+    ViewData["Title"] = "Talep Detayı";
+    bool isManager = User.IsInRole("Admin") || User.IsInRole("Supervisor");
+    var currentDepClaim = User.Claims.FirstOrDefault(c => c.Type == "DepartmentId")?.Value;
+    int currentDepId = string.IsNullOrEmpty(currentDepClaim) ? 0 : int.Parse(currentDepClaim);
+    bool isAuthorizedToEdit = User.IsInRole("Admin") || (User.IsInRole("Supervisor") && Model.TargetDepartmentId == currentDepId);
+}
+
+<div class="d-flex justify-content-between align-items: center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">Talep Detayı <span class="text-muted">#@Model.RecordId</span></h1>
+        <p class="text-muted small mb-0">Talep geçmişi, mevcut durum ve yönetim işlemleri.</p>
+    </div>
+    <a href="/Request/Index" class="btn btn-outline-secondary btn-sm px-3 fw-semibold">
+        <i class="fa-solid fa-arrow-left me-1"></i> Geri Dön
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        @if (Model.ResolutionTimeMinutes.HasValue)
+        {
+            <div class="alert alert-success border-0 shadow-sm mb-4 d-flex align-items-center gap-2">
+                <i class="fa-solid fa-clock fs-5"></i>
+                <div>
+                    <strong>Çözüm Süresi:</strong>
+                    @(Math.Floor(Model.ResolutionTimeMinutes.Value / 60) > 0 ? $"{Math.Floor(Model.ResolutionTimeMinutes.Value / 60)} Saat " : "")
+                    @(Math.Floor(Model.ResolutionTimeMinutes.Value % 60)) Dakika
+                </div>
+            </div>
+        }
+
+        <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <span class="d-block text-muted text-uppercase fs-8 fw-bold">Talep Başlığı</span>
+                        <span class="fw-semibold text-dark fs-6">@Model.Title</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <span class="d-block text-muted text-uppercase fs-8 fw-bold">Açılış Tarihi</span>
+                        <span class="fw-semibold text-dark fs-6">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <span class="d-block text-muted text-uppercase fs-8 fw-bold">Gönderen Personel</span>
+                        <span class="fw-semibold text-dark fs-6">@(Model.User?.Fullname ?? "Bilinmiyor") (@(Model.User?.Department?.DepartmentName ?? "Departman Yok"))</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <span class="d-block text-muted text-uppercase fs-8 fw-bold">Kategori & Aciliyet</span>
+                        <span class="fw-semibold text-dark fs-6">@Model.RecordType - <span class="badge @(Model.Urgency == "Acil" ? "bg-danger" : "bg-warning text-dark")">@Model.Urgency</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-primary fw-bold text-uppercase fs-7">Açıklama / Sorun Detayı</label>
+                <div class="p-3 bg-light border-start border-primary border-4 rounded-end fs-6 text-dark" style="white-space: pre-wrap;">@Model.Content</div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+            {
+                <div class="mb-3">
+                    <a href="@Model.AttachmentPath" target="_blank" class="btn btn-outline-info btn-sm fw-semibold">
+                        <i class="fa-solid fa-paperclip me-1"></i> Ekli Dosyayı Görüntüle
+                    </a>
+                </div>
+            }
+
+            <div>
+                <span class="d-block text-muted text-uppercase fs-8 fw-bold mb-1">Mevcut Durum</span>
+                <span class="badge @(Model.Status == "Çözüldü" ? "bg-success" : (Model.Status == "Reddedildi" ? "bg-danger" : "bg-warning text-dark")) px-3 py-2 fs-6">
+                    @Model.Status
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+        {
+            @if (Model.Status != "Çözüldü" && Model.Status != "Reddedildi")
+            {
+                <div class="card border-0 shadow-sm rounded-3 p-4 mb-4 border-start border-purple border-4" style="border-left-color: #8b5cf6 !important;">
+                    <h5 class="fw-bold text-dark fs-6 mb-2">🔄 Departman Yönlendir</h5>
+                    <p class="text-muted small mb-3">Talebi hatalı birimden alarak doğru departmanın havuzuna aktarın.</p>
+                    <form asp-controller="Request" asp-action="ReassignDepartment" method="post">
+                        <input type="hidden" name="recordId" value="@Model.RecordId" />
+                        <select name="newDepartmentId" required class="form-select form-select-sm mb-3">
+                            <option value="">-- Hedef Birim Seçin --</option>
+                            @if (ViewBag.AllDepartments != null)
+                            {
+                                foreach (var dept in ViewBag.AllDepartments)
+                                {
+                                    if (dept.DepartmentId != Model.TargetDepartmentId)
+                                    {
+                                        <option value="@dept.DepartmentId">@dept.DepartmentName</option>
+                                    }
+                                }
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-purple btn-sm w-100 fw-semibold text-white" style="background: #8b5cf6;">🚀 Yönlendirmeyi Tamamla</button>
+                    </form>
+                </div>
+            }
+        }
+
+        @if (Model.Status == "Çözüldü" || Model.Status == "Reddedildi")
+        {
+            <div class="card border-0 shadow-sm rounded-3 p-4 text-center border-start border-4 @(Model.Status == "Çözüldü" ? "border-success" : "border-danger")">
+                <h5 class="fw-bold text-dark fs-6 mb-2">🔒 Talep Kapatılmıştır</h5>
+                <p class="text-muted small mb-0">İşlem tamamlandığı ya da reddedildiği için kilitlenmiştir.</p>
+            </div>
+        }
+        else if (isAuthorizedToEdit)
+        {
+            <div class="card border-0 shadow-sm rounded-3 p-4 border-dashed border-2">
+                <h5 class="fw-bold text-dark fs-6 mb-3">🛠️ Müdahale Et / Durum Güncelle</h5>
+                <form asp-controller="Request" asp-action="AddFeedback" method="post">
+                    <input type="hidden" name="recordId" value="@Model.RecordId" />
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Yeni Durum</label>
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="İnceleniyor" selected="@(Model.Status == "İnceleniyor")">İnceleniyor</option>
+                            <option value="Çözüldü" selected="@(Model.Status == "Çözüldü")">Çözüldü</option>
+                            <option value="Reddedildi" selected="@(Model.Status == "Reddedildi")">Reddedildi</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Geri Bildirim / Yanıt</label>
+                        <textarea name="feedbackText" rows="3" class="form-control form-control-sm" placeholder="Açıklama veya ret gerekçesi...">@(Model.FeedbackText == "İnceleniyor..." ? "" : Model.FeedbackText)</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold">💾 Değişiklikleri Kaydet</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

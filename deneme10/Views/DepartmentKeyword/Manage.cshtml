@@ -1,0 +1,86 @@
+﻿@model IEnumerable<deneme10.Models.DepartmentKeyword>
+@{
+    var dept = ViewBag.Department as deneme10.Models.Department;
+    ViewData["Title"] = dept.DepartmentName + " Kelimeleri";
+}
+
+<div class="d-flex justify-content-between align-items: center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">⚙️ <span class="text-primary">@dept.DepartmentName</span> - Kelime Yönetimi</h1>
+        <p class="text-muted small mb-0">Bu birime ait yapay zeka yönlendirme kelimelerini inceleyin veya yenilerini ekleyin.</p>
+    </div>
+    <a href="/DepartmentKeyword/Index" class="btn btn-outline-secondary btn-sm px-3 fw-semibold">
+        <i class="fa-solid fa-arrow-left me-1"></i> Departmanlara Dön
+    </a>
+</div>
+
+<!-- HIZLI EKLEME FORMU KARTI -->
+<div class="card border-0 shadow-sm rounded-3 p-4 mb-4 bg-light border-dashed">
+    <h5 class="fw-semibold text-dark fs-6 mb-3">➕ Hızlı Kelime Ekle</h5>
+    <form asp-action="AddKeyword" method="post" class="row g-3 align-items-end">
+        <input type="hidden" name="departmentId" value="@dept.DepartmentId" />
+
+        <div class="col-md-7">
+            <label class="form-label small fw-bold text-secondary">Anahtar Kelime</label>
+            <input type="text" name="word" class="form-control form-control-sm" placeholder="Örn: arıza, maaş bordrosu, şifre..." required autocomplete="off" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label small fw-bold text-secondary">Puan (1-10)</label>
+            <input type="number" name="weight" class="form-control form-control-sm" value="1" min="1" max="10" required />
+        </div>
+
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold">Ekle</button>
+        </div>
+    </form>
+</div>
+
+<!-- MEVCUT KELİMELER TABLOSU -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase fs-7 text-muted">
+                    <tr>
+                        <th class="ps-4">Anahtar Kelime</th>
+                        <th>Puan (Ağırlık)</th>
+                        <th class="text-end pe-4" style="width: 120px;">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold text-dark fs-6">@item.Word</td>
+                                <td>
+                                    @if (item.Weight >= 10)
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger px-2 py-1 fw-bold">🔥 VETO (@item.Weight)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-secondary border px-2 py-1">Standart (@item.Weight)</span>
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form asp-action="Delete" asp-route-id="@item.KeywordId" method="post" onsubmit="return confirm('Bu kelimeyi silmek istediğinize emin misiniz?');" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-trash me-1"></i> Sil</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted fst-italic">Bu departmana ait hiç anahtar kelime eklenmemiş.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

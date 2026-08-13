@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<!-- Yeni Personel Ekleme Formu (Ana Sayfaya Entegre Edildi) -->
+<div class="container mt-4 text-start" style="max-width: 600px;">
+    <h2>Yeni Personel Hesap Oluşturma Ekranı (İK)</h2>
+    <hr />
+
+    @if (ViewBag.Mesaj != null)
+    {
+        <div class="alert alert-success">@ViewBag.Mesaj</div>
+    }
+
+    <form asp-controller="User" asp-action="Create" method="post">
+
+        <div class="mb-3">
+            <label class="form-label">Ad Soyad</label>
+            <input type="text" name="fullname" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">E-posta Adresi</label>
+            <input type="email" name="email" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Şifre</label>
+            <input type="password" name="password" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Departman</label>
+            <select name="departmentId" class="form-control">
+                @if (ViewBag.Departments != null)
+                {
+                    foreach (var dept in ViewBag.Departments)
+                    {
+                        <option value="@dept.DepartmentId">@dept.DepartmentName</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Rol Seçimi</label>
+            <select name="role" class="form-control">
+                <option value="User">Normal Personel (User)</option>
+                <option value="Supervisor">Yönetici (Supervisor)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Personeli Kaydet</button>
+
+    </form>
+</div>

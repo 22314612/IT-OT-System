@@ -1,0 +1,320 @@
+﻿@model IEnumerable<deneme10.Models.Record>
+@{
+    ViewData["Title"] = "Talep Kayıtları";
+}
+
+<style>
+    .btn-enterprise-primary {
+        background-color: #0f172a !important;
+        border-color: #0f172a !important;
+        color: #ffffff !important;
+    }
+
+        .btn-enterprise-primary:hover {
+            background-color: #1e293b !important;
+            border-color: #1e293b !important;
+        }
+
+    .btn-enterprise-secondary {
+        background-color: #475569 !important;
+        border-color: #475569 !important;
+        color: #ffffff !important;
+    }
+
+        .btn-enterprise-secondary:hover {
+            background-color: #334155 !important;
+            border-color: #334155 !important;
+        }
+
+    .badge-status-resolved {
+        background-color: #e2e8f0 !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1;
+        font-weight: 600;
+    }
+
+    .badge-status-rejected {
+        background-color: #f1f5f9 !important;
+        color: #64748b !important;
+        border: 1px solid #cbd5e1;
+        font-weight: 600;
+    }
+
+    .badge-status-pending {
+        background-color: #f8fafc !important;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1;
+        font-weight: 600;
+    }
+
+    .badge-priority-high {
+        background-color: #334155 !important;
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+
+    .badge-priority-med {
+        background-color: #64748b !important;
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+
+    .badge-priority-low {
+        background-color: #94a3b8 !important;
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+
+    /* FİLTRE DROPDOWN AKTİF RENGİ */
+    .dropdown-item.active {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-left: 3px solid #0f172a;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1" style="color: #0f172a !important;">Operasyonel Talep Kayıtları</h1>
+        <p class="text-muted small mb-0">Kurumsal destek biletlerinin takibi ve operasyonel süreç yönetimi.</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+
+        <!-- YENİ EKLENEN ZAMAN FİLTRESİ BUTONU -->
+        <div class="dropdown me-1">
+            <button class="btn btn-outline-secondary btn-sm px-3 fw-semibold shadow-sm dropdown-toggle bg-white" type="button" id="timeFilterBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-regular fa-calendar-check me-1 text-primary"></i>
+                @if (ViewBag.CurrentTimeFilter == "today")
+                {
+                    <text>Sadece Bugün</text>
+                }
+                else if (ViewBag.CurrentTimeFilter == "1week")
+                {
+
+                    <text>Son 1 Hafta</text>
+                }
+                else if (ViewBag.CurrentTimeFilter == "1month")
+                {
+
+                    <text>Son 1 Ay</text>
+                }
+                else if (ViewBag.CurrentTimeFilter == "3months")
+                {
+
+                    <text>Son 3 Ay</text>
+                }
+                else if (ViewBag.CurrentTimeFilter == "6months")
+                {
+
+                    <text>Son 6 Ay</text>
+                }
+                else if (ViewBag.CurrentTimeFilter == "1year")
+                {
+
+                    <text>Son 1 Yıl</text>
+                }
+                else
+                {
+
+                    <text>Tüm Zamanlar</text>
+                }
+            </button>
+            <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="timeFilterBtn" style="font-size: 14px;">
+                <li><a class="dropdown-item py-2 @(ViewBag.CurrentTimeFilter == "today" ? "active fw-bold" : "")" href="/Request/Index?timeFilter=today">📅 Sadece Bugün (Varsayılan)</a></li>
+                <li><a class="dropdown-item py-2 @(ViewBag.CurrentTimeFilter == "1week" ? "active fw-bold" : "")" href="/Request/Index?timeFilter=1week">📅 Son 1 Hafta</a></li>
+                <li><a class="dropdown-item py-2 @(ViewBag.CurrentTimeFilter == "1month" ? "active fw-bold" : "")" href="/Request/Index?timeFilter=1month">📊 Son 1 Ay</a></li>
+                <li><a class="dropdown-item py-2 @(ViewBag.CurrentTimeFilter == "3months" ? "active fw-bold" : "")" href="/Request/Index?timeFilter=3months">📊 Son 3 Ay</a></li>
+                <li><a class="dropdown-item py-2 @(ViewBag.CurrentTimeFilter == "6months" ? "active fw-bold" : "")" href="/Request/Index?timeFilter=6months">📆 Son 6 Ay</a></li>
+                <li><a class="dropdown-item py-2 @(ViewBag.CurrentTimeFilter == "1year" ? "active fw-bold" : "")" href="/Request/Index?timeFilter=1year">📆 Son 1 Yıl</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item py-2 @(ViewBag.CurrentTimeFilter == "all" ? "active fw-bold" : "")" href="/Request/Index?timeFilter=all">📚 Tüm Zamanlar (Arşiv)</a></li>
+            </ul>
+        </div>
+
+        @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+        {
+            <button onclick="openReportModal()" class="btn btn-enterprise-secondary btn-sm px-3 fw-semibold shadow-sm">
+                <i class="fa-solid fa-file-lines me-1"></i> Detaylı Rapor Al
+            </button>
+        }
+        <a href="/Request/Create" class="btn btn-enterprise-primary btn-sm px-3 fw-semibold shadow-sm">
+            <i class="fa-solid fa-plus me-1"></i> Yeni Talep
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase fs-7 text-secondary" style="background-color: #f1f5f9; font-weight: 600;">
+                    <tr>
+                        <th class="ps-4">Kayıt ID</th>
+                        <th>Talep Sahibi ve Birim</th>
+                        <th>Talep Konusu</th>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Supervisor"))
+                        {
+                            <th>Atanan Personel ve Kapanış Zamanı</th>
+                            <th>Öncelik Seviyesi</th>
+                        }
+                        else
+                        {
+                            <th>Kapanış Zamanı</th>
+                        }
+                        <th>Talep Türü</th>
+                        <th>İşlem Durumu</th>
+                        <th class="text-end pe-4">Yönetim Paneli</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        var currentDepClaim = User.Claims.FirstOrDefault(c => c.Type == "DepartmentId")?.Value;
+                        int currentDepId = string.IsNullOrEmpty(currentDepClaim) ? 0 : int.Parse(currentDepClaim);
+                        bool isStandardUser = !User.IsInRole("Admin") && !User.IsInRole("Supervisor");
+
+                        foreach (var item in Model)
+                        {
+                            bool isHalaAcil = !isStandardUser && item.Urgency == "Acil" && item.Status == "İnceleniyor";
+                            string urgentRowClass = isHalaAcil ? "table-secondary" : "";
+
+                            string priorityBadge = "badge-priority-med";
+                            if (item.Urgency == "Acil") priorityBadge = "badge-priority-high";
+                            else if (item.Urgency == "Düşük") priorityBadge = "badge-priority-low";
+
+                            string statusBadge = "badge-status-pending";
+                            if (item.Status == "Çözüldü") statusBadge = "badge-status-resolved";
+                            else if (item.Status == "Reddedildi") statusBadge = "badge-status-rejected";
+
+                            <tr class="@urgentRowClass">
+                                <td class="ps-4 fw-semibold text-secondary">
+                                    #@item.RecordId
+                                    <div class="text-muted fs-8 fw-normal">@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@(item.User?.Fullname ?? "Bilinmiyor")</div>
+                                    <div class="text-muted fs-8">🏢 @(item.User?.Department?.DepartmentName ?? "Departman Yok")</div>
+                                </td>
+                                <td class="fw-medium text-dark">@item.Title</td>
+
+                                @if (!isStandardUser)
+                                {
+                                    <td>
+                                        @if (item.AssignedToUserId != null)
+                                        {
+                                            <div class="text-secondary fw-semibold fs-8">🧑‍💻 @item.AssignedToUserName</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-secondary fw-semibold fs-8 mb-1">🏊‍♂️ Havuzda Bekliyor</div>
+                                            @if (User.IsInRole("Admin") || (User.IsInRole("Supervisor") && item.TargetDepartmentId == currentDepId))
+                                            {
+                                                <form asp-controller="Request" asp-action="AssignToMe" method="post" class="d-inline">
+                                                    <input type="hidden" name="recordId" value="@item.RecordId" />
+                                                    <button type="submit" class="btn btn-outline-secondary btn-xs py-0 px-2 fw-bold" style="font-size: 11px;">✋ Üzerime Al</button>
+                                                </form>
+                                            }
+                                        }
+                                        @if (item.Status == "Çözüldü" && item.ResolvedAt.HasValue)
+                                        {
+                                            <div class="text-muted fs-8 mt-1">✔ @item.ResolvedAt.Value.ToString("dd.MM.yyyy HH:mm")</div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge @priorityBadge px-2 py-1">@(item.Urgency == "Acil" ? "YÜKSEK" : item.Urgency)</span>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @if (item.Status == "Çözüldü" && item.ResolvedAt.HasValue)
+                                        {
+                                            <span class="text-secondary fw-semibold fs-8">✔ @item.ResolvedAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fs-8 fst-italic">İşlemde...</span>
+                                        }
+                                    </td>
+                                }
+
+                                <td><span class="badge bg-light text-secondary border">@item.RecordType</span></td>
+                                <td>
+                                    <span class="badge @statusBadge px-2 py-1">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                        <a href="/Request/Details/@item.RecordId" class="btn btn-light btn-sm border text-secondary fw-semibold">
+                                            <i class="fa-solid fa-magnifying-glass"></i> İncele
+                                        </a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <form asp-controller="Request" asp-action="Delete" asp-route-id="@item.RecordId" method="post" onsubmit="return confirm('Bu kaydı sistemden silmek istediğinize emin misiniz?');" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm text-danger border-0"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="fa-regular fa-folder-open fs-2 text-muted mb-2 d-block"></i>
+                                <span class="text-muted fw-semibold">Bu tarih aralığında kayıtlı talep bulunmamaktadır.</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- KURUMSAL RAPOR SEÇENEKLERİ MODALI -->
+<div id="reportModal" class="modal fade" tabindex="-1" style="display:none; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <div class="modal-header bg-light border-bottom px-4 py-3">
+                <h5 class="modal-title fw-bold text-dark fs-6">
+                    <i class="fa-solid fa-file-lines text-primary me-2"></i> Detaylı Operasyonel Rapor Kriteri
+                </h5>
+                <button type="button" class="btn-close" onclick="closeReportModal()"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Rapor Periyodu Seçiniz</label>
+                    <select id="reportFilter" class="form-select form-select-sm py-2">
+                        <option value="daily">📅 Günlük Rapor (Sadece Bugünün Kayıtları)</option>
+                        <option value="weekly">📊 Haftalık Rapor (Son 7 Günün Kayıtları)</option>
+                        <option value="monthly">📆 Aylık Rapor (Bu Ayın Kayıtları)</option>
+                        <option value="all">📚 Kapsamlı Tüm Zamanlar Raporu</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-enterprise-primary w-100 fw-semibold py-2 mt-2" onclick="generateReport()">
+                    <i class="fa-solid fa-download me-1"></i> Raporu Dışa Aktar ve İndir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openReportModal() {
+        document.getElementById('reportModal').style.display = 'block';
+        document.getElementById('reportModal').classList.add('show');
+    }
+    function closeReportModal() {
+        document.getElementById('reportModal').style.display = 'none';
+        document.getElementById('reportModal').classList.remove('show');
+    }
+    function generateReport() {
+        var filter = document.getElementById('reportFilter').value;
+        window.location.href = '/Request/DetailedReport?filter=' + filter;
+    }
+</script>

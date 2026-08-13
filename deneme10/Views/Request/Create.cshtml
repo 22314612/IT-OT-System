@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Yeni Talep Oluştur";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">📝 Yeni Operasyonel Talep Oluştur</h1>
+        <p class="text-muted small mb-0">Arıza veya destek biletinizi sisteme kaydedin. Yapay zeka ilgili departmana otomatik yönlendirme yapacaktır.</p>
+    </div>
+    <a href="/Request/Index" class="btn btn-outline-secondary btn-sm px-3 fw-semibold">
+        <i class="fa-solid fa-arrow-left me-1"></i> Talep Listesine Dön
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-3 p-4">
+
+            <form asp-controller="Request" asp-action="Create" method="post" enctype="multipart/form-data">
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Talep Başlığı</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-heading text-muted"></i></span>
+                        <input type="text" name="title" class="form-control" placeholder="Örn: 2 Nolu Pres Makinesi Arızası" required autocomplete="off" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Öncelik Seviyesi</label>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="urgency" id="urgency-low" value="Düşük">
+                            <label class="btn btn-outline-success w-100 py-2 fw-semibold fs-7" for="urgency-low">🟢 Düşük</label>
+                        </div>
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="urgency" id="urgency-med" value="Orta" checked>
+                            <label class="btn btn-outline-warning text-dark w-100 py-2 fw-semibold fs-7" for="urgency-med">🟡 Orta</label>
+                        </div>
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="urgency" id="urgency-high" value="Acil">
+                            <label class="btn btn-outline-danger w-100 py-2 fw-semibold fs-7" for="urgency-high">🔴 Acil</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Talep Detayı / Açıklama</label>
+                    <textarea name="content" rows="5" class="form-control" placeholder="Lütfen sorununuzu detaylıca açıklayın..." required></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">📎 Dosya Eki (İsteğe Bağlı)</label>
+                    <input type="file" name="attachment" accept=".pdf, .jpg, .jpeg, .png" class="form-control bg-light" style="cursor: pointer;" />
+                </div>
+
+                <button type="submit" class="btn w-100 fw-semibold py-2" style="background-color: #0f172a; color: white;">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Talebi Gönder ve Başlat
+                </button>
+
+            </form>
+        </div>
+    </div>
+</div>

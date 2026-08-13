@@ -1,0 +1,79 @@
+﻿@model IEnumerable<deneme10.Models.Department>
+@{
+    ViewData["Title"] = "Departmanlar";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">Departman Yönetimi</h1>
+        <p class="text-muted small mb-0">Kurumsal birimler ve departman bazlı personel listeleri.</p>
+    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <a href="/Department/Create" class="btn btn-primary btn-sm fw-semibold px-3">
+            <i class="fa-solid fa-plus me-1"></i> Yeni Departman Ekle
+        </a>
+    }
+</div>
+
+<div class="row g-4">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var dept in Model)
+        {
+            int userCount = dept.Users != null ? dept.Users.Count() : 0;
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-3 p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="fw-bold text-dark mb-0">🏢 @dept.DepartmentName</h5>
+                        <span class="badge bg-light text-secondary border">ID: #@dept.DepartmentId</span>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100 d-flex justify-content-between align-items-center mt-3 py-2 px-3 fw-semibold" onclick="toggleAccordion(this)">
+                        <span>👥 Çalışan Listesi (@userCount)</span>
+                        <i class="fa-solid fa-chevron-down small"></i>
+                    </button>
+
+                    <div class="user-list-container mt-2" style="max-height: 0; overflow: hidden; transition: max-height 0.4s ease;">
+                        @if (dept.Users != null && dept.Users.Any())
+                        {
+                            foreach (var user in dept.Users)
+                            {
+                                <div class="p-2 bg-light rounded-2 border mt-2 fs-7">
+                                    <div class="fw-bold text-dark">@user.Fullname</div>
+                                    <div class="text-muted fs-8">@user.Email</div>
+                                    <span class="badge bg-success-subtle text-success fs-9">@user.Role</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-muted fs-8 fst-italic text-center py-3">Bu birimde henüz kayıtlı personel bulunmuyor.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="text-center py-5 text-muted fst-italic bg-white rounded-3 shadow-sm border">Kayıtlı departman bulunamadı.</div>
+        </div>
+    }
+</div>
+
+<script>
+    function toggleAccordion(btn) {
+        var container = btn.nextElementSibling;
+        var icon = btn.querySelector("i");
+        if (container.style.maxHeight && container.style.maxHeight !== "0px") {
+            container.style.maxHeight = "0px";
+            icon.style.transform = "rotate(0deg)";
+        } else {
+            container.style.maxHeight = container.scrollHeight + "px";
+            icon.style.transform = "rotate(180deg)";
+        }
+        icon.style.transition = "transform 0.3s ease";
+    }
+</script>

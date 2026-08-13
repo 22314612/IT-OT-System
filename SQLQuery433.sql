@@ -1,0 +1,1 @@
+﻿ALTER TABLE Departments ADD SupervisorId INT NULL;

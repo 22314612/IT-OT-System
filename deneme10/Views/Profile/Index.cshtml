@@ -1,0 +1,82 @@
+﻿@model deneme10.Models.User
+@{
+    ViewData["Title"] = "Profil Ayarları";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">👤 Profil Bilgilerim</h1>
+        <p class="text-muted small mb-0">Hesap bilgilerinizi görüntüleyin ve güncelleyin.</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3 p-4 position-relative">
+
+            <!-- DÜZENLE BUTONU -->
+            <button type="button" class="btn btn-outline-secondary btn-sm position-absolute top-0 end-0 m-4 px-3 fw-semibold rounded-pill" id="editButton" onclick="enableEditing()">
+                <i class="fa-solid fa-pen-to-square me-1"></i> Düzenle
+            </button>
+
+            <h5 class="fw-bold text-dark mb-4 pb-3 border-bottom">Hesap Detayları</h5>
+
+            <form asp-controller="Profile" asp-action="Update" method="post">
+                <input type="hidden" name="UserId" value="@Model?.UserId" />
+
+                <!-- AD SOYAD -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Ad Soyad</label>
+                    <input type="text" name="Fullname" value="@(Model?.Fullname ?? "")" readonly class="form-control bg-light text-muted" style="cursor: not-allowed;" />
+                </div>
+
+                <!-- ROL / YETKİ -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Rol / Yetki</label>
+                    <input type="text" name="Role" value="@(Model?.Role ?? "")" readonly class="form-control bg-light text-muted" style="cursor: not-allowed;" />
+                </div>
+
+                <!-- E-POSTA -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">E-posta Adresi</label>
+                    <input type="email" name="Email" id="emailInput" value="@(Model?.Email ?? "")" readonly class="form-control bg-light" required />
+                </div>
+
+                <!-- ŞİFRE -->
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Şifre</label>
+                    <input type="password" name="Password" id="passwordInput" placeholder="••••••••" readonly class="form-control bg-light" />
+                </div>
+
+                <!-- KAYDET BUTONU (VARSAYILAN GİZLİ) -->
+                <button class="btn btn-success w-100 fw-semibold py-2" type="submit" id="saveButton" style="display: none;">
+                    <i class="fa-solid fa-check me-1"></i> Değişiklikleri Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function enableEditing() {
+        var emailField = document.getElementById('emailInput');
+        var passwordField = document.getElementById('passwordInput');
+
+        // E-posta alanını aç
+        emailField.removeAttribute('readonly');
+        emailField.classList.remove('bg-light', 'text-muted');
+        emailField.classList.add('bg-white', 'border-primary');
+
+        // Şifre alanını aç
+        passwordField.removeAttribute('readonly');
+        passwordField.classList.remove('bg-light', 'text-muted');
+        passwordField.classList.add('bg-white', 'border-primary');
+        passwordField.placeholder = "Yeni şifrenizi giriniz (Opsiyonel)";
+
+        // Butonları değiştir
+        document.getElementById('saveButton').style.display = "block";
+        document.getElementById('editButton').style.display = "none";
+
+        emailField.focus();
+    }
+</script>

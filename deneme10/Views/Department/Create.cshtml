@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Yeni Departman Ekle";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">🏢 Yeni Departman Ekle</h1>
+        <p class="text-muted small mb-0">Sisteme yeni bir kurumsal birim veya departman tanımlayın.</p>
+    </div>
+    <a href="/Department/Index" class="btn btn-outline-secondary btn-sm px-3 fw-semibold">
+        <i class="fa-solid fa-arrow-left me-1"></i> Departman Listesine Dön
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3 p-4">
+
+            @if (ViewBag.Mesaj != null)
+            {
+                <div class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+                    <i class="fa-solid fa-circle-check fs-5"></i>
+                    <div>@ViewBag.Mesaj</div>
+                </div>
+            }
+
+            <!-- Departman Ekleme Formu -->
+            <form asp-controller="Department" asp-action="Create" method="post">
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Departman Adı</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-building text-muted"></i></span>
+                        <input type="text" name="departmentName" class="form-control" placeholder="Örn: Bilgi İşlem (IT)" required autocomplete="off" />
+                    </div>
+                    <div class="form-text text-muted fs-8">Şirket içinde kullanılacak birim adını tam olarak girin.</div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 fw-semibold py-2">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Departmanı Kaydet
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>

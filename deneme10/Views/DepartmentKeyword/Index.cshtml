@@ -1,0 +1,52 @@
+﻿@model IEnumerable<deneme10.Models.Department>
+@{
+    ViewData["Title"] = "Kelime Havuzu Departmanları";
+    var counts = ViewBag.KeywordCounts as Dictionary<int, int>;
+}
+
+<div class="d-flex justify-content-between align-items: center mb-4">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">🧠 Yapay Zeka Kelime Havuzu</h1>
+        <p class="text-muted small mb-0">Otomatik talep yönlendirme sisteminin hangi departman için hangi kelimeleri kullanacağını yönetin.</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase fs-7 text-muted">
+                    <tr>
+                        <th class="ps-4">Departman Adı</th>
+                        <th>Kayıtlı Kelime Sayısı</th>
+                        <th class="text-end pe-4">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var dept in Model)
+                        {
+                            int count = counts != null && counts.ContainsKey(dept.DepartmentId) ? counts[dept.DepartmentId] : 0;
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark fs-6">@dept.DepartmentName</td>
+                                <td><span class="badge bg-light text-dark border px-2 py-1">@count Kelime</span></td>
+                                <td class="text-end pe-4">
+                                    <a href="/DepartmentKeyword/Manage/@dept.DepartmentId" class="btn btn-primary btn-sm fw-semibold px-3">
+                                        <i class="fa-solid fa-gear me-1"></i> Kelimeleri Yönet
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted fst-italic">Kayıtlı departman bulunamadı.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
